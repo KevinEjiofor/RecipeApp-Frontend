@@ -78,7 +78,7 @@ export const resetPassword = async (resetPin, newPassword) => {
     try {
         console.log("Entered resetPassword function with token and newPassword:", { resetPin, newPassword });
 
-        const response = await axios.put(`${API_BASE_URL}/resetpassword/${resetPin}`, { newPassword }, {
+        const response = await axios.put(`${API_BASE_URL}/resetPassword/${resetPin}`, { newPassword }, {
             headers: {
                 'Content-Type': 'application/json',
             }
@@ -96,7 +96,7 @@ export const validateResetPin = async (resetPin) => {
     try {
         console.log("Entered validateResetPin function with resetPin:", resetPin);
 
-        const response = await axios.post(`${API_BASE_URL}/validate-reset-pin`, { resetPin }, {
+        const response = await axios.put(`${API_BASE_URL}/validate-reset-pin`, { resetPin }, {
             headers: {
                 'Content-Type': 'application/json',
             }

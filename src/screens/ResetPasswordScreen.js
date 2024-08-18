@@ -1,56 +1,69 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image } from 'react-native';
-import { Ionicons } from '@expo/vector-icons'; // For eye icon
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import Chef from "../../assets/chefHat.png";
 import { resetPassword, validateResetPin } from '../api';
 
 const ResetPasswordScreen = ({ route, navigation }) => {
-    const [pin, setPin] = useState(['', '', '', '', '', '']); // The PIN fields
+    const [pin, setPin] = useState(['', '', '', '', '', '']);
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [tokenValidated, setTokenValidated] = useState(false); // Track token validation
+    const [tokenValidated, setTokenValidated] = useState(false);
+
+    const [pinError, setPinError] = useState('');
+    const [passwordError, setPasswordError] = useState('');
+    const [confirmPasswordError, setConfirmPasswordError] = useState('');
+
+    const inputRefs = useRef([]);
 
     const handlePinChange = (index, value) => {
         const newPin = [...pin];
-        newPin[index] = value.replace(/[^0-9]/g, ''); // Allow only numbers
+        newPin[index] = value.replace(/[^0-9]/g, '');
         setPin(newPin);
 
         if (value && index < 5) {
-            const nextInput = index + 1;
             setTimeout(() => {
-                const nextInputRef = inputRefs[nextInput];
-                if (nextInputRef) nextInputRef.focus();
+                inputRefs.current[index + 1]?.focus();
             }, 100);
         }
     };
 
     const handleResetPassword = async () => {
         const resetPasswordPin = pin.join('');
+        let hasError = false;
+
         if (pin.some(value => value === '')) {
-            Alert.alert('Error', 'Please fill in all PIN fields.');
-            return;
+            setPinError('Please fill in all PIN fields.');
+            hasError = true;
+        } else {
+            setPinError('');
         }
 
         if (!password || !confirmPassword) {
-            Alert.alert('Error', 'Please enter and confirm your password.');
-            return;
+            setPasswordError('Please enter and confirm your password.');
+            hasError = true;
+        } else {
+            setPasswordError('');
         }
 
         if (password !== confirmPassword) {
-            Alert.alert('Error', 'Passwords do not match.');
-            return;
+            setConfirmPasswordError('Passwords do not match.');
+            hasError = true;
+        } else {
+            setConfirmPasswordError('');
         }
+
+        if (hasError) return;
 
         setLoading(true);
         try {
-            await resetPassword(resetPasswordPin, password); // API call with PIN
-            Alert.alert('Success', 'Password reset successful.');
+            await resetPassword(resetPasswordPin, password);
             navigation.navigate('Login');
         } catch (error) {
-            Alert.alert('Error', 'Failed to reset password.');
+            setPasswordError('Failed to reset password.');
         } finally {
             setLoading(false);
         }
@@ -59,26 +72,27 @@ const ResetPasswordScreen = ({ route, navigation }) => {
     const validateToken = async () => {
         const resetPin = pin.join('');
         if (pin.some(value => value === '')) {
-            Alert.alert('Error', 'Please fill in all PIN fields.');
+            setPinError('Please fill in all PIN fields.');
             return;
+        } else {
+            setPinError('');
         }
 
         setLoading(true);
         try {
             const response = await validateResetPin(resetPin);
             if (response.message === 'Pin is valid') {
-                setTokenValidated(true); // If token is valid, show password fields
+                setTokenValidated(true);
             } else {
-                Alert.alert('Error', 'Invalid or expired pin');
+                setPinError('Invalid or expired pin');
             }
         } catch (error) {
-            Alert.alert('Error', 'Failed to validate pin.');
+            setPinError('Failed to validate pin.');
         } finally {
             setLoading(false);
         }
     };
 
-    const inputRefs = [];
     return (
         <View style={styles.container}>
             <View style={styles.container2}>
@@ -94,22 +108,24 @@ const ResetPasswordScreen = ({ route, navigation }) => {
                         <Text style={styles.label}>Enter PIN</Text>
                         <View style={styles.pinContainer}>
                             {pin.map((value, index) => (
-                                <TextInput
-                                    key={index}
-                                    style={styles.pinInput}
-                                    value={value}
-                                    onChangeText={(text) => handlePinChange(index, text)}
-                                    keyboardType="numeric"
-                                    maxLength={1}
-                                    ref={(ref) => (inputRefs[index] = ref)}
-                                    onKeyPress={({ nativeEvent }) => {
-                                        if (nativeEvent.key === 'Backspace' && !value && index > 0) {
-                                            inputRefs[index - 1].focus();
-                                        }
-                                    }}
-                                />
+                                <View key={index} style={styles.pinInputContainer}>
+                                    <TextInput
+                                        style={styles.pinInput}
+                                        value={value}
+                                        onChangeText={(text) => handlePinChange(index, text)}
+                                        keyboardType="numeric"
+                                        maxLength={1}
+                                        ref={ref => inputRefs.current[index] = ref}
+                                        onKeyPress={({ nativeEvent }) => {
+                                            if (nativeEvent.key === 'Backspace' && !value && index > 0) {
+                                                inputRefs.current[index - 1]?.focus();
+                                            }
+                                        }}
+                                    />
+                                </View>
                             ))}
                         </View>
+                        {pinError ? <Text style={styles.errorText}>{pinError}</Text> : null}
                         <TouchableOpacity
                             style={[styles.button, loading && styles.buttonDisabled]}
                             onPress={validateToken}
@@ -142,6 +158,7 @@ const ResetPasswordScreen = ({ route, navigation }) => {
                                 />
                             </TouchableOpacity>
                         </View>
+                        {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
 
                         <Text style={styles.label}>Confirm Password</Text>
                         <View style={styles.passwordContainer}>
@@ -163,6 +180,7 @@ const ResetPasswordScreen = ({ route, navigation }) => {
                                 />
                             </TouchableOpacity>
                         </View>
+                        {confirmPasswordError ? <Text style={styles.errorText}>{confirmPasswordError}</Text> : null}
 
                         <TouchableOpacity
                             style={[styles.button, loading && styles.buttonDisabled]}
@@ -214,6 +232,10 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         marginBottom: 20,
     },
+    pinInputContainer: {
+        flex: 1,
+        alignItems: 'center',
+    },
     pinInput: {
         height: 50,
         width: 50,
@@ -262,6 +284,11 @@ const styles = StyleSheet.create({
         fontSize: 18,
         color: '#fff',
         fontWeight: 'bold',
+    },
+    errorText: {
+        color: 'red',
+        fontSize: 14,
+        marginBottom: 10,
     },
 });
 
