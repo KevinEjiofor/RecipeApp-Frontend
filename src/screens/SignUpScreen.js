@@ -50,10 +50,9 @@ const SignUpScreen = ({ navigation }) => {
             setLoading(true);
             try {
                 const response = await signUp({ email, password, username });
-                Alert.alert('Success', 'Account created successfully!');
-                // Navigate or perform additional actions here
+                navigation.navigate('Login'); 
             } catch (error) {
-                // Display the error message from the backend
+               
                 Alert.alert('Error', error.message || 'Failed to create account. Please try again.');
             } finally {
                 setLoading(false);

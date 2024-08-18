@@ -56,3 +56,57 @@ export const login = async (credentials) => {
         throw error.response ? error.response.data : new Error('An unknown error occurred'); 
     }
 };
+export const forgotPassword = async (email) => {
+    try {
+        console.log("Entered forgotPassword function with email:", email);
+
+        const response = await axios.post(`${API_BASE_URL}/forgotpassword`, { email }, {
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        console.log("Response data:", response.data);
+
+        return response.data;
+    } catch (error) {
+        console.error("Error sending password reset email:", error.response ? error.response.data : error.message);
+        throw error.response ? error.response.data : new Error('An unknown error occurred');
+    }
+};
+export const resetPassword = async (resetPin, newPassword) => {
+    try {
+        console.log("Entered resetPassword function with token and newPassword:", { resetPin, newPassword });
+
+        const response = await axios.put(`${API_BASE_URL}/resetpassword/${resetPin}`, { newPassword }, {
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        console.log("Response data:", response.data);
+
+        return response.data;
+    } catch (error) {
+        console.error("Error resetting password:", error.response ? error.response.data : error.message);
+        throw error.response ? error.response.data : new Error('An unknown error occurred');
+    }
+};
+export const validateResetPin = async (resetPin) => {
+    try {
+        console.log("Entered validateResetPin function with resetPin:", resetPin);
+
+        const response = await axios.post(`${API_BASE_URL}/validate-reset-pin`, { resetPin }, {
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        console.log("Response data:", response.data);
+
+        return response.data;
+    } catch (error) {
+        console.error("Error validating reset pin:", error.response ? error.response.data : error.message);
+        throw error.response ? error.response.data : new Error('An unknown error occurred');
+    }
+};

@@ -8,7 +8,7 @@ const LoginScreen = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
-    const [errors, setErrors] = useState({ email: '', password: '' });
+    const [errors, setErrors] = useState({ email: '', password: '', general: '' });
 
     const handleLogin = async () => {
         let isValid = true;
@@ -36,7 +36,8 @@ const LoginScreen = ({ navigation }) => {
             const data = await login({ email, password });
             navigation.navigate('Recipes', { userId: data.userId });
         } catch (error) {
-            console.error('Error logging in:', error);
+            // Set error message in state for display
+            setErrors(prev => ({ ...prev, general: 'Invalid credentials' }));
         }
     };
 
@@ -83,7 +84,10 @@ const LoginScreen = ({ navigation }) => {
                 </TouchableOpacity>
                 {errors.password ? <Text style={styles.errorText}>{errors.password}</Text> : null}
 
-                {/* TouchableOpacity for navigating to ForgotPasswordScreen */}
+             
+                {errors.general ? <Text style={styles.errorText}>{errors.general}</Text> : null}
+
+               
                 <TouchableOpacity onPress={() => navigation.navigate('Forget Password')}>
                     <Text style={styles.forgotPassword}>Forgot Password?</Text>
                 </TouchableOpacity>
@@ -148,7 +152,7 @@ const styles = StyleSheet.create({
         position: 'absolute',
         right: 10,
         bottom: 60,
-    },
+     },
     forgotPassword: {
         color: '#007BFF',
         marginTop: -5,
