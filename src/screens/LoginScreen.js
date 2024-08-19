@@ -36,7 +36,7 @@ const LoginScreen = ({ navigation }) => {
             const data = await login({ email, password });
             navigation.navigate('Recipes', { userId: data.userId });
         } catch (error) {
-            // Set error message in state for display
+        
             setErrors(prev => ({ ...prev, general: 'Invalid credentials' }));
         }
     };
@@ -103,8 +103,8 @@ const LoginScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',  // Center content vertically
-        alignItems: 'center',  // Center content horizontally
+        justifyContent: 'center', 
+        alignItems: 'center',  
         padding: 15,
         backgroundColor: '#fff',
     },
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     eyeIcon: {
         position: 'absolute',
         right: 10,
-        bottom: 60,
+        bottom: 45,
      },
     forgotPassword: {
         color: '#007BFF',

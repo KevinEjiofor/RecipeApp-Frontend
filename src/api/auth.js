@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
-const API_BASE_URL = 'http://192.168.0.10:3030/auth'; // Ensure this is the correct URL
+const API_BASE_URL = 'http://192.168.0.10:3030/auth'; 
 
 const setAuthHeader = (jwt) => {
     axios.defaults.headers.common['Authorization'] = `Bearer ${jwt}`;
@@ -31,18 +31,15 @@ export const signUp = async (userData) => {
         throw error.response ? error.response.data : new Error('An unknown error occurred'); 
     }
 };
-
-export const login = async (credentials) => {
+export const login = async ({ email, password }) => {
     try {
-        console.log("Entered login function with credentials:", credentials);
+        console.log("Entered login function with credentials:", email, password);
 
-        const response = await axios.post(`${API_BASE_URL}/login`, credentials, {
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        });
-
-        console.log("Response data:", response.data);
+        const response = await axios.post(
+            `${API_BASE_URL}/login`,
+            { email, password }, 
+            { headers: { 'Content-Type': 'application/json' } }
+        );
 
         const { token } = response.data;
         if (token) {
@@ -50,15 +47,44 @@ export const login = async (credentials) => {
             setAuthHeader(token); 
         }
 
+        console.log("Response data:", response.data);
+
         return response.data;
     } catch (error) {
         console.error("Error logging in:", error.response ? error.response.data : error.message);
         throw error.response ? error.response.data : new Error('An unknown error occurred'); 
     }
 };
+
+
+
+// export const login = async ({email, password}) => {
+//     try {
+//         console.log("Entered login function with credentials:", email, password);
+
+//         const response = await axios.post(`${API_BASE_URL}/login`, {
+//             headers: {
+//                 'Content-Type': 'application/json',
+//             },body: JSON.stringify({ email, password }),
+//         });
+//         const { token } = response.data;
+//         if (token) {
+//             await AsyncStorage.setItem('jwt', token);
+//             setAuthHeader(token); 
+//         }
+
+
+//         console.log("Response data:", response.data);
+
+//         return response.data;
+//     } catch (error) {
+//         console.error("Error logging in:", error.response ? error.response.data : error.message);
+//         throw error.response ? error.response.data : new Error('An unknown error occurred'); 
+//     }
+// };
 export const forgotPassword = async (email) => {
     try {
-        console.log("Entered forgotPassword function with email:", email);
+       
 
         const response = await axios.post(`${API_BASE_URL}/forgotpassword`, { email }, {
             headers: {
@@ -66,7 +92,7 @@ export const forgotPassword = async (email) => {
             }
         });
 
-        console.log("Response data:", response.data);
+       
 
         return response.data;
     } catch (error) {
@@ -74,24 +100,31 @@ export const forgotPassword = async (email) => {
         throw error.response ? error.response.data : new Error('An unknown error occurred');
     }
 };
-export const resetPassword = async (resetPin, newPassword) => {
+export const resetPassword = async ({ resetPin, newPassword }) => {
     try {
-        console.log("Entered resetPassword function with token and newPassword:", { resetPin, newPassword });
-
-        const response = await axios.put(`${API_BASE_URL}/resetPassword/${resetPin}`, { newPassword }, {
+        const response = await fetch(`${API_BASE_URL}/resetpassword`, {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-            }
+            },
+            body: JSON.stringify({ resetPin, newPassword }),
         });
 
-        console.log("Response data:", response.data);
+        const data = await response.json();
+        console.log('Response data:', data);
 
-        return response.data;
+        if (!response.ok) {
+            throw new Error(data.message || 'Failed to reset password');
+        }
+
+        return data;
     } catch (error) {
-        console.error("Error resetting password:", error.response ? error.response.data : error.message);
-        throw error.response ? error.response.data : new Error('An unknown error occurred');
+        console.error('Error resetting password:', error);
+        throw error;
     }
 };
+
+
 export const validateResetPin = async (resetPin) => {
     try {
         console.log("Entered validateResetPin function with resetPin:", resetPin);

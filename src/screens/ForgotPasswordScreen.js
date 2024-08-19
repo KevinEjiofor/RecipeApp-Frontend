@@ -16,9 +16,9 @@ const ForgotPasswordScreen = ({ navigation }) => {
 
         setLoading(true);
         try {
-            await forgotPassword(email); // Call API to send the email
-            setErrorMessage(''); // Clear any error messages
-            navigation.navigate('ResetPassword'); // Navigate to ResetPasswordScreen upon success
+            await forgotPassword(email); 
+            setErrorMessage(''); 
+            navigation.navigate('ResetPassword'); 
         } catch (error) {
             setErrorMessage(error.message || 'Failed to send password reset email.');
         } finally {

@@ -1,14 +1,13 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
-import FavoriteButton from './FavoriteButton';
+import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 
-const RecipeCard = ({ recipe, userId, onPress }) => {
+const RecipeCard = ({ recipe, onPress }) => {
     return (
         <TouchableOpacity style={styles.card} onPress={() => onPress(recipe.id)}>
             <Image source={{ uri: recipe.image }} style={styles.image} />
-            <View style={styles.content}>
+            <View style={styles.textContainer}>
                 <Text style={styles.title}>{recipe.title}</Text>
-                <FavoriteButton userId={userId} recipeId={recipe.id} isFavorite={recipe.isFavorite} />
+                
             </View>
         </TouchableOpacity>
     );
@@ -16,27 +15,23 @@ const RecipeCard = ({ recipe, userId, onPress }) => {
 
 const styles = StyleSheet.create({
     card: {
+        backgroundColor: '#fff',
         borderRadius: 10,
         overflow: 'hidden',
         marginBottom: 15,
-        backgroundColor: '#fff',
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
-        shadowOffset: { width: 0, height: 2 },
-        shadowRadius: 5,
-        elevation: 2,
+        elevation: 3,
     },
     image: {
         width: '100%',
         height: 150,
-        resizeMode: 'cover',
     },
-    content: {
+    textContainer: {
         padding: 15,
     },
     title: {
         fontSize: 18,
         fontWeight: 'bold',
+        color: '#333',
     },
 });
 

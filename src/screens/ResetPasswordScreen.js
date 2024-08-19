@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Chef from "../../assets/chefHat.png";
-import { resetPassword, validateResetPin } from '../api';
+import { resetPassword, validateResetPin } from '../api'; // Ensure these functions are correctly implemented
 
 const ResetPasswordScreen = ({ route, navigation }) => {
     const [pin, setPin] = useState(['', '', '', '', '', '']);
@@ -32,43 +32,63 @@ const ResetPasswordScreen = ({ route, navigation }) => {
     };
 
     const handleResetPassword = async () => {
-        const resetPasswordPin = pin.join('');
+        const resetPin = pin.join('');
+    
         let hasError = false;
-
+    
         if (pin.some(value => value === '')) {
             setPinError('Please fill in all PIN fields.');
             hasError = true;
         } else {
             setPinError('');
         }
-
+    
         if (!password || !confirmPassword) {
             setPasswordError('Please enter and confirm your password.');
             hasError = true;
         } else {
             setPasswordError('');
         }
-
+    
         if (password !== confirmPassword) {
             setConfirmPasswordError('Passwords do not match.');
             hasError = true;
         } else {
             setConfirmPasswordError('');
         }
-
+    
         if (hasError) return;
-
+    
         setLoading(true);
         try {
-            await resetPassword(resetPasswordPin, password);
-            navigation.navigate('Login');
+            const response = await resetPassword({ resetPin, newPassword: password });
+            if (response.message === 'Password reset successful') {
+                navigation.navigate('Login');
+            } else {
+                setPasswordError(response.message || 'Failed to reset password.');
+            }
         } catch (error) {
-            setPasswordError('Failed to reset password.');
-        } finally {
-            setLoading(false);
+            setPasswordError(error.message || 'Failed to reset password.');
         }
+        
+        // try {
+            
+        //     console.log("Payload:", { resetPin, newPassword: password });
+    
+        //     const response = await resetPassword({ resetPin, newPassword: password });
+    
+        //     if (response.message === 'Password reset successful') {
+        //         navigation.navigate('Login');
+        //     } else {
+        //         setPasswordError(response.message || 'Failed to reset password.');
+        //     }
+        // } catch (error) {
+        //     setPasswordError(error.message || 'Failed to reset password.');
+        // } finally {
+        //     setLoading(false);
+        // }
     };
-
+    
     const validateToken = async () => {
         const resetPin = pin.join('');
         if (pin.some(value => value === '')) {
@@ -287,7 +307,6 @@ const styles = StyleSheet.create({
     },
     errorText: {
         color: 'red',
-        fontSize: 14,
         marginBottom: 10,
     },
 });

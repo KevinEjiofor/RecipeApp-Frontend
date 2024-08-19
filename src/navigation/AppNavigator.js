@@ -22,8 +22,8 @@ const AppNavigator = () => (
             <Stack.Screen name="Forget Password" component={ForgotPasswordScreen} options={{headerShown:true}} />
             <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} options={{headerShown:true}} />
             <Stack.Screen name="Recipes" component={RecipesScreen} options={{headerShown: false}} />
-            <Stack.Screen name="RecipeDetails" component={RecipeDetailsScreen} options={{headerShown: false}} />
-            <Stack.Screen name="Favorites" component={FavoritesScreen} options={{headerShown: false}} />
+            <Stack.Screen name="RecipeDetails" component={RecipeDetailsScreen} options={{headerShown: true}} />
+            <Stack.Screen name="Favorites" component={FavoritesScreen} options={{headerShown: true}} />
         </Stack.Navigator>
     </NavigationContainer>
 );
