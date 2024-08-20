@@ -50,7 +50,8 @@ const RecipesScreen = ({ navigation, route }) => {
                 />
                 <Text style={styles.title}>Chargie Recipe</Text>
                 <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-                    <Icon name="sign-out" size={25} color="red" />
+                    <Icon name="sign-out" size={25} color="#fff" />
+                    <Text style={styles.logoutButtonText}>Logout</Text>
                 </TouchableOpacity>
             </View>
             <View style={styles.searchContainer}>
@@ -130,14 +131,15 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     chefIcon: {
-        width: 60,
+        width: 50,
         height: 60,
-        marginRight: 15,
+        marginRight: 5,
     },
     title: {
         fontSize: 26,
         fontWeight: 'bold',
         color: 'black',
+        marginRight: 7,
     },
     label: {
         fontSize: 18,
@@ -155,7 +157,17 @@ const styles = StyleSheet.create({
         elevation: 5,
     },
     logoutButton: {
-        padding: 10,
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#ff4d4d',
+        paddingHorizontal: 15,
+        paddingVertical: 10,
+        borderRadius: 30,
+    },
+    logoutButtonText: {
+        color: '#fff',
+        fontSize: 16,
+        marginLeft: 8,
     },
 });
 
