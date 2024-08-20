@@ -1,7 +1,6 @@
 # RecipeApp-Frontend
 
-
-This project involves building a mobile application for the "Chargie Recipe" platform using React Native. The app includes several key screens, each designed to facilitate user interactions and enhance the overall user experience.
+This project involves building a mobile application for the "Chargie Recipe" platform using React Native. The app allows users to interact with recipes, manage their favorites, and handle authentication processes.
 
 ## Screens and Components
 
@@ -45,6 +44,20 @@ This project involves building a mobile application for the "Chargie Recipe" pla
      - **Buttons**: For navigating to the sign-up and login screens.
      - **Background Image**: Features a background image or icon to enhance the visual appeal.
 
+### 6. **Favorites Screen**
+   - **Purpose**: Displays a list of recipes that the user has marked as favorites.
+   - **Features**:
+     - **Fetch Favorites**: Retrieves the list of favorite recipes from the backend using the `getFavorites` API call.
+     - **Remove Favorite**: Allows users to remove recipes from their favorites list using the `deleteFavorite` API call.
+     - **Recipe Navigation**: Users can navigate to the details of each favorite recipe.
+     - **Loading State**: Shows a loading indicator while favorites are being fetched.
+   - **Technology Used**: 
+     - **React Native**: For building the mobile app interface.
+     - **FlatList**: For displaying the list of favorite recipes efficiently.
+     - **ActivityIndicator**: For showing a loading spinner while data is being fetched.
+     - **Axios**: For making API requests to fetch and delete favorite recipes.
+     - **AsyncStorage**: For storing JWT tokens and other persistent data.
+
 ## Authentication and Token Management
 
 - **JWT Token Handling**: Both the sign-up and login screens handle JWT tokens. Upon successful authentication, the token is stored in `AsyncStorage` and used for subsequent authenticated API requests.
@@ -54,4 +67,30 @@ This project involves building a mobile application for the "Chargie Recipe" pla
 
 - **Styling**: The app utilizes a custom font and has a consistent styling theme across all screens.
 - **Responsiveness**: The design is optimized for various device sizes and orientations.
+- **Technology Used**:
+  - **Frontend**: React Native
+  - **State Management**: React hooks
+  - **API Communication**: Axios
+  - **Navigation**: React Navigation
+  - **Icons**: React Native Vector Icons
 
+## API Endpoints
+
+### Authentication
+- **POST** `/auth/register`: Register a new user
+- **POST** `/auth/login`: Login and receive a JWT
+- **POST** `/auth/forgotpassword`: Request a password reset link
+- **PUT** `/auth/validate-reset-pin`: Validate the reset PIN sent to the user
+- **POST** `/auth/resetpassword`: Reset the user's password using the validated PIN
+- **POST** `/auth/logout`: Logout the user and invalidate the JWT
+
+### Recipe Search
+- **GET** `/search`: Search for recipes using a query
+
+### Recipe Details
+- **GET** `/recipe/:id`: Get detailed information about a specific recipe
+
+### Favorite Recipes (Protected Routes)
+- **POST** `/favorites`: Save a recipe to favorites
+- **GET** `/favorites`: Retrieve all favorite recipes for the authenticated user
+- **DELETE** `/favorites/:id`: Remove a recipe from favorites
