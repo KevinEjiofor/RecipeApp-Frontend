@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
 import { getFavorites, deleteFavorite } from '../api/favorites';
-import RecipeCard from '../components/RecipeCardFavorite';
+import RecipeCardFavorite from '../components/RecipeCardFavorite';
 
-const FavoritesScreen = ({ route }) => {
+const FavoritesScreen = ({ navigation }) => {
     const [favorites, setFavorites] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -23,12 +23,18 @@ const FavoritesScreen = ({ route }) => {
     }, []);
 
     const handleRemoveFavorite = async (recipeId) => {
+        console.log('Removing favorite:', recipeId);
         try {
+
             await deleteFavorite(recipeId);
-            fetchFavorites();
+            setFavorites(favorites.filter(favorite => favorite._id !== recipeId));
         } catch (error) {
             console.error('Error removing favorite:', error);
         }
+    };
+
+    const handleRecipePress = (recipeId) => {
+        navigation.navigate('RecipeDetails', { recipeId });
     };
 
     if (loading) {
@@ -42,12 +48,13 @@ const FavoritesScreen = ({ route }) => {
                 data={favorites}
                 keyExtractor={(item) => (item._id.$oid || item._id || '').toString()}
                 renderItem={({ item }) => (
-                    <RecipeCard 
+                    <RecipeCardFavorite 
                         recipe={item} 
-                        isFavorite={true}
+                        onPress={() => handleRecipePress(item.recipeId)}
                         onToggleFavorite={() => handleRemoveFavorite(item._id.$oid || item._id)}
                     />
                 )}
+                showsVerticalScrollIndicator={false}  
             />
         </View>
     );

@@ -1,22 +1,33 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, ScrollView, Image, TouchableOpacity } from 'react-native';
 import { getRecipeDetails } from '../api/recipes';
-import { addFavorite, deleteFavorite } from '../api/favorites'; 
+import { addFavorite, deleteFavorite, getFavorites } from '../api/favorites'; 
 import Icon from 'react-native-vector-icons/FontAwesome'; 
 import { htmlToText } from 'html-to-text';
 
 const RecipeDetailsScreen = ({ route }) => {
-    const { recipeId, userId } = route.params;
+    const { recipeId } = route.params; 
     const [recipe, setRecipe] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isFavorite, setIsFavorite] = useState(false);
-
+    const [favoriteId, setFavoriteId] = useState(null); 
     useEffect(() => {
         const fetchRecipeDetails = async () => {
             try {
                 const data = await getRecipeDetails(recipeId);
                 setRecipe(data);
-                setIsFavorite(data.isFavorite); 
+
+                
+                const favorites = await getFavorites();
+                const favorite = favorites.find(fav => fav.recipeId === recipeId);
+                
+                if (favorite) {
+                    setIsFavorite(true);
+                    setFavoriteId(favorite._id);  
+                } else {
+                    setIsFavorite(false);
+                    setFavoriteId(null);
+                }
             } catch (error) {
                 console.error('Error fetching recipe details:', error);
             } finally {
@@ -27,46 +38,42 @@ const RecipeDetailsScreen = ({ route }) => {
         fetchRecipeDetails();
     }, [recipeId]);
 
-    const toggleFavorite = async () => {
+    const addFavoriteRecipe = async () => {
         try {
-            console.log(`Current favorite status: ${isFavorite}`);
-            console.log(`Recipe ID: ${recipeId}`);
-    
-            if (isFavorite) {
-                console.log(`Deleting favorite with ID: ${recipeId}`);
-                await deleteFavorite(recipeId);
-                setIsFavorite(false);
-            } else {
-                await addFavorite({
-                    recipeId,
-                    title: recipe.title,
-                    ingredients: recipe.extendedIngredients.map(ing => ing.original),
-                });
-                setIsFavorite(true);
-            }
+            const favoriteData = await addFavorite({
+                recipeId,
+                title: recipe.title,
+                ingredients: recipe.extendedIngredients.map(ing => ing.original),
+                image: recipe.image,
+            });
+            setIsFavorite(true);
+            setFavoriteId(favoriteData._id);  
+                      
         } catch (error) {
-            console.error('Error toggling favorite status:', error);
+            console.error('Error adding favorite:', error);
         }
     };
-    
 
-    // const toggleFavorite = async () => {
-    //     try {
-    //         if (isFavorite) {
-    //             await deleteFavorite(recipeId);
-    //             setIsFavorite(false);
-    //         } else {
-    //             await addFavorite({
-    //                 recipeId,
-    //                 title: recipe.title,
-    //                 ingredients: recipe.extendedIngredients.map(ing => ing.original),
-    //             });
-    //             setIsFavorite(true);
-    //         }
-    //     } catch (error) {
-    //         console.error('Error toggling favorite status:', error);
-    //     }
-    // };
+    const removeFavoriteRecipe = async () => {
+        if (!favoriteId) return;  
+
+        try {
+            await deleteFavorite(favoriteId);  
+            setIsFavorite(false);
+            setFavoriteId(null);
+         
+        } catch (error) {
+            console.error('Error removing favorite:', error);
+        }
+    };
+
+    const toggleFavorite = () => {
+        if (isFavorite) {
+            removeFavoriteRecipe();
+        } else {
+            addFavoriteRecipe();
+        }
+    };
 
     if (loading) {
         return <ActivityIndicator size="large" style={styles.loader} />;
@@ -76,7 +83,6 @@ const RecipeDetailsScreen = ({ route }) => {
         return <Text style={styles.error}>Recipe not found</Text>;
     }
 
-    // Convert HTML summary and instructions to plain text
     const summaryText = htmlToText(recipe.summary || '');
     const instructionsText = htmlToText(recipe.instructions || '');
 

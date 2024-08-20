@@ -58,30 +58,6 @@ export const login = async ({ email, password }) => {
 
 
 
-// export const login = async ({email, password}) => {
-//     try {
-//         console.log("Entered login function with credentials:", email, password);
-
-//         const response = await axios.post(`${API_BASE_URL}/login`, {
-//             headers: {
-//                 'Content-Type': 'application/json',
-//             },body: JSON.stringify({ email, password }),
-//         });
-//         const { token } = response.data;
-//         if (token) {
-//             await AsyncStorage.setItem('jwt', token);
-//             setAuthHeader(token); 
-//         }
-
-
-//         console.log("Response data:", response.data);
-
-//         return response.data;
-//     } catch (error) {
-//         console.error("Error logging in:", error.response ? error.response.data : error.message);
-//         throw error.response ? error.response.data : new Error('An unknown error occurred'); 
-//     }
-// };
 export const forgotPassword = async (email) => {
     try {
        
@@ -140,6 +116,26 @@ export const validateResetPin = async (resetPin) => {
         return response.data;
     } catch (error) {
         console.error("Error validating reset pin:", error.response ? error.response.data : error.message);
+        throw error.response ? error.response.data : new Error('An unknown error occurred');
+    }
+};
+export const logoutUser = async () => {
+    try {
+ 
+
+       
+        await axios.post(`${API_BASE_URL}/logout`, {}, {
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        await AsyncStorage.removeItem('jwt');
+
+        delete axios.defaults.headers.common['Authorization'];
+
+    } catch (error) {
+        console.error("Error logging out:", error.response ? error.response.data : error.message);
         throw error.response ? error.response.data : new Error('An unknown error occurred');
     }
 };

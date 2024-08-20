@@ -1,25 +1,28 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
-const RecipeCard = ({ recipe, isFavorite, onToggleFavorite }) => {
+const RecipeCardFavorite = ({ recipe, onPress, onToggleFavorite }) => {
     return (
-        <View style={styles.card}>
-            {recipe.imageUrl ? (
+        <TouchableOpacity onPress={onPress} style={styles.card}>
+            {recipe.image ? (  
                 <Image 
-                    source={{ uri: recipe.imageUrl }} // Ensure this is correct
+                    source={{ uri: recipe.image }} 
                     style={styles.image}
-                    resizeMode="cover" // Adjust based on your layout
+                    resizeMode="cover"
                 />
             ) : (
                 <View style={styles.imagePlaceholder}>
                     <Text style={styles.imageText}>No Image Available</Text>
                 </View>
             )}
-            <Text style={styles.title}>{recipe.title}</Text>
-            <TouchableOpacity onPress={onToggleFavorite} style={styles.favoriteButton}>
-                <Text>{isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}</Text>
-            </TouchableOpacity>
-        </View>
+            <View style={styles.infoContainer}>
+                <Text style={styles.title}>{recipe.title}</Text>
+                <TouchableOpacity onPress={onToggleFavorite} style={styles.favoriteButton}>
+                    <Icon name="heart" size={24} color="red" />
+                </TouchableOpacity>
+            </View>
+        </TouchableOpacity>
     );
 };
 
@@ -32,7 +35,7 @@ const styles = StyleSheet.create({
     },
     image: {
         width: '100%',
-        height: 200, // Adjust height based on your layout
+        height: 200,
     },
     imagePlaceholder: {
         width: '100%',
@@ -44,16 +47,22 @@ const styles = StyleSheet.create({
     imageText: {
         color: '#888',
     },
+    infoContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: 10,
+    },
     title: {
         fontSize: 18,
         fontWeight: 'bold',
-        padding: 10,
+        flex: 1,
     },
     favoriteButton: {
         padding: 10,
         backgroundColor: '#f8f8f8',
-        alignItems: 'center',
+        borderRadius: 50,
     },
 });
 
-export default RecipeCard;
+export default RecipeCardFavorite;

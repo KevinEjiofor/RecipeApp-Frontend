@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, Text, FlatList, TextInput, ActivityIndicator, StyleSheet, Button, Image, TouchableOpacity } from 'react-native';
 import { searchRecipes } from '../api/recipes';
+import { logoutUser } from '../api/auth';
 import RecipeCard from '../components/RecipeCard'; 
 import Chef from "../../assets/chefHat.png"; 
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -31,6 +32,15 @@ const RecipesScreen = ({ navigation, route }) => {
         navigation.navigate('Favorites');
     };
 
+    const handleLogout = async () => {
+        try {
+            await logoutUser(); 
+            navigation.replace('Home'); 
+        } catch (error) {
+            console.error('Error during logout:', error);
+        }
+    };
+
     return (
         <View style={styles.container}>
             <View style={styles.headerContainer}>
@@ -39,6 +49,9 @@ const RecipesScreen = ({ navigation, route }) => {
                     style={styles.chefIcon}
                 />
                 <Text style={styles.title}>Chargie Recipe</Text>
+                <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+                    <Icon name="sign-out" size={25} color="red" />
+                </TouchableOpacity>
             </View>
             <View style={styles.searchContainer}>
                 <Text style={styles.label}>Search Recipes</Text> 
@@ -87,6 +100,7 @@ const styles = StyleSheet.create({
     headerContainer: {
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'space-between',
         marginBottom: 20,
         marginTop: 50,
     },
@@ -139,6 +153,9 @@ const styles = StyleSheet.create({
         padding: 10,
         borderRadius: 50,
         elevation: 5,
+    },
+    logoutButton: {
+        padding: 10,
     },
 });
 
